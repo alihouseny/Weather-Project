@@ -3,108 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
-    <link rel="stylesheet" href="style.css"/>   
+    <title>Atmosfera — Weather</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<div class="container fade-in">
+<!-- Noise texture overlay -->
+<div class="noise"></div>
 
-    <div class="weather_animation"></div>
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-    <div class="city-background"></div>
+<div class="app">
 
-    <div class="weather_container glass">
-
-        <div class="temp">
-            <p data-temp>20°</p>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">◈</span>
+            <span class="logo-text">Atmosfera</span>
         </div>
-
-        <div class="time_location">
-            <p class="city" data-city>Cairo</p>
-            <p class="time" data-time>6:30 · Friday 2026-01-23</p>
+        <div class="header-actions">
+            <button class="btn-unit" id="unitToggle" title="Toggle °C / °F">°C</button>
+            <button class="btn-icon" id="themeToggle" title="Toggle theme">◑</button>
+            <button class="btn-icon" id="geoBtn" title="Use my location">◎</button>
         </div>
+    </header>
 
-        <div class="condition">
-            <img class="weather_icon" alt="weather icon" />
-            <p data-condition>Mist</p>
-        </div>
-
-        <div class="weather_comment">
-            <p data-comment>🤔 Checking the vibe...</p>
-        </div>
-
-        <!-- NEW: Weather Stats -->
-        <div class="weather_stats">
-            <div class="stat_item">
-                <div class="stat_label">Feels Like</div>
-                <div class="stat_value" data-feelslike>--°</div>
+    <!-- ===== SEARCH ===== -->
+    <div class="search-wrapper">
+        <form id="searchForm">
+            <div class="search-box">
+                <svg class="search-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search city..."
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <div class="search-suggestions" id="suggestions"></div>
             </div>
-            <div class="stat_item">
-                <div class="stat_label">Humidity</div>
-                <div class="stat_value" data-humidity>--%</div>
-            </div>
-            <div class="stat_item">
-                <div class="stat_label">Wind Speed</div>
-                <div class="stat_value" data-wind>-- km/h</div>
-            </div>
-            <div class="stat_item">
-                <div class="stat_label">UV Index</div>
-                <div class="stat_value" data-uv>--</div>
-            </div>
-        </div>
-
-        <!-- NEW: Sun Times -->
-        <div class="sun_times">
-            <div class="sun_item">
-                <div class="sun_icon">🌅</div>
-                <div class="sun_info">
-                    <p>Sunrise</p>
-                    <p data-sunrise>--:--</p>
-                </div>
-            </div>
-            <div class="sun_item">
-                <div class="sun_icon">🌇</div>
-                <div class="sun_info">
-                    <p>Sunset</p>
-                    <p data-sunset>--:--</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loader -->
-        <div class="loader hidden">
-            <span></span>
-        </div>
-
+        </form>
     </div>
 
-    <!-- Search -->
-    <nav class="nav">
-        <form>
-            <div class="search_box">
-                <span class="search_icon">🔍</span>
-                <input 
-                    type="text" 
-                    placeholder="Search for a location"
-                    class="search_area"
-                    autocomplete="off"
-                />
+    <!-- ===== MAIN GRID ===== -->
+    <main class="grid">
+
+        <!-- HERO CARD -->
+        <div class="card card-hero" id="heroCard">
+            <div class="city-bg" id="cityBg"></div>
+            <div class="card-inner">
+                <div class="hero-top">
+                    <div>
+                        <p class="city-name" id="cityName">Cairo</p>
+                        <p class="city-country" id="cityCountry">Egypt</p>
+                    </div>
+                    <img class="hero-icon" id="heroIcon" alt="weather" />
+                </div>
+                <div class="hero-temp">
+                    <span id="tempValue">--</span><span class="temp-unit" id="tempUnit">°C</span>
+                </div>
+                <p class="hero-condition" id="heroCondition">Loading...</p>
+                <p class="hero-time" id="heroTime">--:-- · --- ---</p>
+                <div class="hero-comment" id="heroComment">🤔 Checking the vibe...</div>
             </div>
+            <!-- Weather animation layer -->
+            <div class="weather-anim" id="weatherAnim"></div>
+            <!-- Loader -->
+            <div class="loader" id="loader">
+                <div class="loader-ring"></div>
+            </div>
+        </div>
 
-            <p class="search_hint">
-               Try: The Cloud Whisperer🧙‍♂️🔮 🌩️
-            </p>
-        </form>
-    </nav>
+        <!-- STATS CARD -->
+        <div class="card card-stats">
+            <h3 class="card-title">Conditions</h3>
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-icon">🌡️</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Feels Like</span>
+                        <span class="stat-val" id="feelsLike">--°</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Humidity</span>
+                        <span class="stat-val" id="humidity">--%</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">🌬️</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Wind</span>
+                        <span class="stat-val" id="wind">-- km/h</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">☀️</div>
+                    <div class="stat-info">
+                        <span class="stat-label">UV Index</span>
+                        <span class="stat-val" id="uv">--</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">👁️</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Visibility</span>
+                        <span class="stat-val" id="visibility">-- km</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">🌀</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Pressure</span>
+                        <span class="stat-val" id="pressure">-- mb</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Footer with your name -->
+        <!-- SUN CARD -->
+        <div class="card card-sun">
+            <h3 class="card-title">Sun</h3>
+            <div class="sun-arc-wrapper">
+                <svg class="sun-arc" viewBox="0 0 200 110">
+                    <path class="arc-track" d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke-width="3"/>
+                    <path class="arc-progress" id="arcProgress" d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke-width="3"/>
+                    <circle class="sun-dot" id="sunDot" cx="100" cy="10" r="7"/>
+                </svg>
+                <div class="sun-center-time" id="sunCenterTime">--:--</div>
+            </div>
+            <div class="sun-times">
+                <div class="sun-time-item">
+                    <span class="sun-emoji">🌅</span>
+                    <span class="sun-label">Sunrise</span>
+                    <span class="sun-val" id="sunrise">--:--</span>
+                </div>
+                <div class="sun-time-item">
+                    <span class="sun-emoji">🌇</span>
+                    <span class="sun-label">Sunset</span>
+                    <span class="sun-val" id="sunset">--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORECAST CARD -->
+        <div class="card card-forecast">
+            <h3 class="card-title">3-Day Forecast</h3>
+            <div class="forecast-list" id="forecastList">
+                <div class="forecast-skeleton"></div>
+                <div class="forecast-skeleton"></div>
+                <div class="forecast-skeleton"></div>
+            </div>
+        </div>
+
+        <!-- AIR QUALITY CARD -->
+        <div class="card card-aqi">
+            <h3 class="card-title">Air Quality</h3>
+            <div class="aqi-display">
+                <div class="aqi-circle" id="aqiCircle">
+                    <span class="aqi-number" id="aqiNumber">--</span>
+                    <span class="aqi-label-inner">AQI</span>
+                </div>
+                <div class="aqi-info">
+                    <p class="aqi-status" id="aqiStatus">--</p>
+                    <p class="aqi-desc" id="aqiDesc">Fetching air quality data...</p>
+                    <div class="aqi-bar-wrap">
+                        <div class="aqi-bar">
+                            <div class="aqi-bar-fill" id="aqiBarFill"></div>
+                            <div class="aqi-bar-marker" id="aqiMarker"></div>
+                        </div>
+                        <div class="aqi-scale">
+                            <span>Good</span>
+                            <span>Moderate</span>
+                            <span>Unhealthy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOURLY CARD -->
+        <div class="card card-hourly">
+            <h3 class="card-title">Hourly</h3>
+            <div class="hourly-scroll" id="hourlyScroll">
+                <!-- filled by JS -->
+            </div>
+        </div>
+
+        <!-- HISTORY CARD -->
+        <div class="card card-history">
+            <h3 class="card-title">Recent Searches</h3>
+            <div class="history-list" id="historyList">
+                <p class="history-empty">No recent searches</p>
+            </div>
+        </div>
+
+    </main>
+
     <footer class="footer">
-        <p>Made by <span class="creator-name">Ali ELHadad</span></p>
+        Made by <span>Ali ELHadad</span> · Powered by WeatherAPI
     </footer>
 
 </div>
 
-<script src="script.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

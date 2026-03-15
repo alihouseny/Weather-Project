@@ -30,7 +30,9 @@ const cityImages = {
     "new york": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200",
     "paris": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200",
     "tokyo": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200",
-    "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200"
+    "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200",
+    "Beijing": " https://images.unsplash.com/photo-1510001618818-4b4e3d86bf0f?w=870 "
+
 };
 
 /* ===== Default Location ===== */
@@ -233,7 +235,7 @@ function getDayName(number) {
 /* ===== Background Change ===== */
 function changeBackground(condition) {
     container.className = "container fade-in";
-    // Clear previous particles
+
     weatherAnimation.innerHTML = "";
 
     condition = condition.toLowerCase();
